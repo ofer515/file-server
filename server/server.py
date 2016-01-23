@@ -2,13 +2,13 @@ import socket
 import os
 import thread
 
+allowed_files = ['txt', 'png', 'jpg','doc', 'docx']
 
 
-
-ser_socket = socket.socket()
-
-
+#socket set up and where all connections are formed and receive a thread
 def main(port):
+
+    ser_socket = socket.socket()
     ser_socket.bind(("127.0.0.1", port))
     ser_socket.settimeout(100)
     ser_socket.listen(10)
@@ -24,6 +24,7 @@ def main(port):
             pass
 
 
+#the server receive the file and checks it
 def recv_files(client_soc):
     try:
         ack_msg = client_soc.recv(1024)
@@ -31,6 +32,8 @@ def recv_files(client_soc):
         if "sending file name:" in ack_msg:
             f_name = str(ack_msg.split(":", 1)[-1])
             print(f_name)
+            if f_name.split(".")[-1] not in allowed_files:
+                client_soc.close()
             new_file = open(f_name, 'wb')
             msg = str("receiving file name: "+f_name)
             print msg
@@ -48,13 +51,13 @@ def recv_files(client_soc):
             print "not in protocol, try reconnecting"
             client_soc.close()
     except Exception as e:
-        if e == "[Errno 10054] An existing connection was forcibly closed by the remote host":
+        if str(e) == "[Errno 10054] An existing connection was forcibly closed by the remote host":
             print("user disconnected")
         else:
             print e
 
 
-
+#every newly formed connection and then sent to the function it wishes to preform
 def handle_connection(client_soc, client_addr):
     try:
         client_soc.setblocking(100)
@@ -65,18 +68,15 @@ def handle_connection(client_soc, client_addr):
         request = client_soc.recv(1024)
         if request == "upload":
             recv_files(client_soc)
-        elif request is "download":
+        elif request == "download":
             pass
         else:
             ser_socket.close()
     except Exception as e:
-        if e == "[Errno 10054] An existing connection was forcibly closed by the remote host":
+        if str(e) == "[Errno 10054] An existing connection was forcibly closed by the remote host":
             print("user disconnected")
         else:
             print e
-
-
-
 
 
 if __name__ == "__main__":

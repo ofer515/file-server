@@ -4,6 +4,7 @@ import os
 allowed_files = ['txt', 'png', 'jpg','doc', 'docx']
 
 
+#showing receiving all file in dir and returning a list of allowed files(see dictionary)
 def files_available(files):
     file_list = []
     for file_name in files:
@@ -15,6 +16,12 @@ def files_available(files):
     return file_list
 
 
+#in the works, will allow to download file from server
+def recv_file(down_file_name, client_soc):
+    pass
+
+
+#receiving the file(after it has been checked) you wish to download and socket, uploads it to server
 def send_file(up_file_name, client_soc):
     up_file = open(up_file_name, 'rb')
     temp_holder = up_file.read(1024)
@@ -24,6 +31,8 @@ def send_file(up_file_name, client_soc):
     print "send successfully"
     client_soc.close()
 
+
+#where the user start the progrem and choose which function he wishes to preform
 def main(file_list):
     client_soc = socket.socket()
     client_soc.connect(("127.0.0.1", 5679))
